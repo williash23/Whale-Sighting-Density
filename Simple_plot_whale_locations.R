@@ -15,6 +15,30 @@ geocode("Glacier Bay National Park")
 
 #  Read in whale observation data. This data frame currently has whale locations in UTM (zone 8N) format only.
 data <- read.csv("C:/Users/sara.williams/Documents/GitHub/Whale-Sighting-Density/data/Whale_obs_pts_clean.csv")
+x <- c(
+437581.6153,
+437273.3745,
+437290.4661,
+437143.3414,
+438153.1081,
+437392.1686,
+436988.1231
+)
+y <- c(
+6492696.063,
+6490684.219,
+6490761.703,
+6490324.36,
+6492548.972,
+6488938.64,
+6489010.367
+
+)
+data <- as.data.frame(cbind(x, y))
+coordinates(data) <- c("x", "y")
+xy <- as.data.frame(data)
+plot(xy)
+
 # #   Clean to remove points where whale depth is greater than -3m (i.e., above the water)
 # data <- filter(data, whale_depth_m <= -3)
 # #   Clean to remove points where whale distance to shore is less than 0 (i.e., on land)
@@ -26,9 +50,9 @@ bounds <- c(-137.5, 57.0, -134.5, 59.0)
 SA <- get_map(location=bounds, source="stamen", maptype="watercolor", crop=FALSE) 
 
 #  Convert UTM coordinates in data file to XY data for displaying points.
-coordinates(data) <- c("whale_easting", "whale_northing")
-		proj4string(data) <- CRS("+proj=utm +zone=8 + datum=WGS84 + ellps=WGS84") 
-		xy <- as.data.frame(spTransform(data, CRS("+proj=longlat + datum=WGS84 + ellps=WGS84")))
+coordinates(data) <- c("x", "y")
+proj4string(data) <- CRS("+proj=utm +zone=8 + datum=WGS84 + ellps=WGS84") 
+xy <- as.data.frame(spTransform(data, CRS("+proj=longlat + datum=WGS84 + ellps=WGS84")))
 		
 #  Display map and whale locations.
 ggmap(SA)+

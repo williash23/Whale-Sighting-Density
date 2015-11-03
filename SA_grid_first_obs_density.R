@@ -7,21 +7,12 @@
 library(dplyr)
 ################################################################################
 
-#  Read in and fitler data.
-#   Read in whale observation data. This data frame currently has whale locations in UTM (zone 8N) format only.
-data <- read.csv("C:/Users/sara.williams/Documents/GitHub/Whale-Sighting-Density/data/Whale_obs_pts_All_covs.csv")
-#   Clean to remove points where whale depth is greater than -3m (i.e., above the water)
-data <- filter(data, whale_depth_m <= -3)
-#   Clean to remove points where whale distance to shore is less than 3m (i.e., on land)
-data <- filter(data, whale_dist_to_shore_m > 3)
+#  Read in whale observation data. This data frame currently has whale locations in UTM (zone 8N) format only.
+data <- read.csv("C:/Users/sara.williams/Documents/GitHub/Data-Cleaning/data/.....")
 #   Sort out only first observations.
 data <- filter(data, ObOrder_Time == 1)
 # #   Write as csv for plotting in ArcMap as needed.
 # write.csv(data, "whale_obs_clean_first_sight.csv")
-
-#  Note: there is one first sighting observation where Count is errorneously
-#   entered as 0. Changed this value to 1. 
-data$Count[data$Count == 0] <- 1
 #############################################################################
 
 #  Variables that Determine  "how busy" the bay is (i.e. density of sightings)
