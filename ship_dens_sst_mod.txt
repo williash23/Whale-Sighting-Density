@@ -1,0 +1,25 @@
+model{
+			
+			#  Priors
+			for(i in 1:k){
+				mean[i] <-0
+				}
+				
+			beta[1:k] ~ dmnorm(mean[1:k], omega[1:k,1:k])
+			omega[1:k,1:k] ~ dwish(R[,], k+1)
+			sigma[1:k,1:k] <- inverse(omega[1:k,1:k])		
+			
+			tau <- 1/ (sig * sig)
+			sig ~ dgamma(0.01, 0.01)
+						
+			#  Linear predictor
+			for(i in 1:n_cell){
+				mu[i] <- beta[1] + beta[2]*trk_length_sum_km_scaled[i]  + beta[3]*sst_clim_scaled[i]
+				}
+     
+			#  Likelihood
+			for(i in 1:n_cell){
+				adjusted_count_sum[i] ~ dnorm(mu[i], tau)
+				}
+				
+	}

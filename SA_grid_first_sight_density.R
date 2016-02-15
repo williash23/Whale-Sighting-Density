@@ -5,12 +5,6 @@
 #   over entire study period.
 ################################################################################
 
-# Created new variable.... ...first sighting density summed over grid cells and adjusted count based on detection probability given distance, count and visibility. 
-
-# Also extracted all environmental covariates based on grid cell done using centroid X and Y of each grid cell.
-
-# Also generated a variable of sum track length that passed through each grid cell --- made to adjust based on area of grid cell (not all are the same as land area was taken out).
-
 #  Load packages
 library(dplyr)
 library(rgeos)
@@ -19,8 +13,10 @@ library(raster)
 library(rgdal)
 library(spatstat)
 library(maptools)
-
+library(utils)
+library(Distance)
 ################################################################################
+
 #  Load data - grid and first sight intersect shapefile (already in UTM)
 #  This is first sightings final data (n=3838)
 first_sights_grd <- shapefile("E:/AK_Shapefiles/final_dat_first_sights_grid.shp")
@@ -50,19 +46,15 @@ dat <- temp2%>%
 #  Generate response variable for sighting density analysis
 #  Response = group size/ (detection probability at given distance and group size)			 
 
-#  Load packages
-library(utils)
-library(Distance)
-
-#  Establish detection probability for model including group size, visibility and distance
-colnames(dat)[colnames(dat)=="ship_whale_distance"] <- "distance"
-det_mod<-ds(data = dat, 
-					  formula= ~1+visibility+count_factor,
-					  truncation="15%",
-					  transect="point",
-					  key="hr",
-					  adjustment=NULL)
-summary(det_mod)
+			#  Establish detection probability for model including group size, visibility and distance
+			# colnames(dat)[colnames(dat)=="ship_whale_distance"] <- "distance"
+			# det_mod<-ds(data = dat, 
+								  # formula= ~1+visibility+count_factor,
+								  # truncation="15%",
+								  # transect="point",
+								  # key="hr",
+								  # adjustment=NULL)
+			# summary(det_mod)
 
 						# # # Summary for distance analysis 
 						# # # Number of observations :  3262 
@@ -219,6 +211,7 @@ adjusted_first_sight <- final_detect_dat %>%
 adjusted_first_sight_gridID <- adjusted_first_sight%>%
 															  group_by(grid_ID) %>%
 									                          mutate(adjusted_count_sum= sum(adjusted_count)) %>%
+															  mutate(count_sum = sum(count)) %>%
 									                          ungroup(.) %>%
 									                          as.data.frame(.)	
 # write.csv(adjusted_first_sight_gridID, file="adjusted_density_by_first_sighting.csv")			
@@ -230,23 +223,22 @@ names(grid_df) <- c("grid_ID")
 #  From adjusted density counts attached to first sights, get a sum adjusted density 
 #   value for each grid cell that has observations in it.
 grid_adjusted_density <- adjusted_first_sight_gridID %>%
-													dplyr::select(grid_ID, adjusted_count_sum) %>%
+													dplyr::select(grid_ID, adjusted_count_sum, count_sum) %>%
 													as.data.frame(.) %>%
 													distinct(grid_ID) %>%
 													arrange(grid_ID)
-
+													  
 #  Join adjusted density sum count  to empty grid cell ID dataframe so each grid cell
 #  has a density value.
 whole_grid_adjusted_density <- right_join(grid_adjusted_density, grid_df, by ="grid_ID")
 #   Change NA's to 0's.
 whole_grid_adjusted_density[is.na(whole_grid_adjusted_density)] <- 0
-# write.csv(whole_grid_adjusted_density, file="adjusted_density_by_gridID.csv")		
+# write.csv(whole_grid_adjusted_density, file="adjusted_density_by_gridID.csv")	
 
 #  Attach adjusted density sum count to other covariates associated with grid ID.
 grid_env_covs <- read.csv("C:/Users/sara.williams/Documents/GitHub/Whale-Sighting-Density/data/env_covariates_gridID.csv")
 grid_env_covs_sighting_density <- full_join(whole_grid_adjusted_density, grid_env_covs, by = "grid_ID")
 # write.csv(grid_env_covs_sighting_density, file="env_covs_sighting_density_by_gridID.csv")
-
 ################################################################################
 
 
