@@ -4,7 +4,7 @@
 ################################################################################
 library(R2jags)
 library(corrplot)
-library(mcmcplots)		
+library(mcmcplots)    
 
 dat <- read.csv("C:/Users/sara.williams/Documents/GitHub/Whale-Sighting-Density/data/env_ship_covs_sighting_density_by_gridID_red_grid_15detect.csv")
 dat$sst_clim_scaled <- as.numeric(scale(dat$sst_clim, T))
@@ -17,8 +17,8 @@ dat <- na.omit(dat)
 plot(dat$adjusted_count_sum, dat$trk_length_sum_km_scaled)
 
 cor_dat <- dat %>%
-					 dplyr::select(sst_clim_scaled, chlor_clim_scaled, bath_scaled,trk_length_sum_km_scaled,
-					 dist_shore_m_scaled)
+           dplyr::select(sst_clim_scaled, chlor_clim_scaled, bath_scaled,trk_length_sum_km_scaled,
+           dist_shore_m_scaled)
 m <- cor(cor_dat)
 corrplot(m, method = "number", type = "upper", order = "FPC")
 

@@ -13,7 +13,7 @@
 #   back to the original grid polygon shapefile (using match type "contains") and summed  the length of
 #   lines going through each grid cell.
 
-################################################################################	   
+################################################################################     
 
 library(rgeos)
 library(sp)
@@ -30,7 +30,7 @@ trk_dat_df <-as.data.frame(trk_dat)
 cent_dist_dat <- shapefile("E:/AK_Shapefiles/grid_centroids.shp")
 cent_dist_dat_df <-as.data.frame(cent_dist_dat)
 cent_dist_dat_df <- cent_dist_dat_df %>%
-										dplyr:: select(Id, NEAR_DIST)
+                    dplyr:: select(Id, NEAR_DIST)
 names(cent_dist_dat_df) <- c("grid_ID", "dist_shore_m")
 
 grd_dat <- shapefile("E:/AK_Shapefiles/SA_grid_no_land.shp")
@@ -40,14 +40,14 @@ grd_dat_df <- full_join(grd_dat_df_tmp, cent_dist_dat_df, by = "grid_ID")
 
 #  Clean up dataset and generate desired values
 trk_sum_grid_ID <- trk_dat_df %>%
-										  mutate(trk_length_sum_km = trk_length_sum_m/1000) %>%
-										  distinct(grid_ID) %>%
-										  arrange(grid_ID)
+                      mutate(trk_length_sum_km = trk_length_sum_m/1000) %>%
+                      distinct(grid_ID) %>%
+                      arrange(grid_ID)
 
 trk_sum_standard_grid_ID_tmp <- full_join(grd_dat_df, trk_sum_grid_ID, by = "grid_ID")
 trk_sum_standard_grid_ID <- trk_sum_standard_grid_ID_tmp %>%
-															mutate(stand_trk_length_m = trk_length_sum_m/cell_area) 
-# write.csv(trk_sum_standard_grid_ID, file="trk_length_cell_area_by_gridID.csv")	
+                              mutate(stand_trk_length_m = trk_length_sum_m/cell_area) 
+# write.csv(trk_sum_standard_grid_ID, file="trk_length_cell_area_by_gridID.csv")  
 
 #  Attach adjusted density sum count to other covariates associated with grid ID.
 grid_env_covs_sighting_density <- read.csv("C:/Users/sara.williams/Documents/GitHub/Whale-Sighting-Density/data/env_covs_sighting_density_by_gridID.csv")
@@ -57,16 +57,16 @@ grid_env_ship_covs_sighting_density <- full_join(trk_sum_standard_grid_ID, grid_
 #  Subset to only grid cells within 3500m of ship track line (detection probability under excellent, group size 1 = .05)
 red_grd_3500_tmp <- as.data.frame(shapefile("E:/AK_Shapefiles/trk_length_grid_join_3500.shp"))
 red_grd_3500 <- red_grd_3500_tmp %>%
-								  dplyr::select(Id) %>%
-								  rename(grid_ID = Id)
+                  dplyr::select(Id) %>%
+                  rename(grid_ID = Id)
 red_grid_3500_adjusted_ship_density <- semi_join(grid_env_ship_covs_sighting_density, red_grd_3500, by = "grid_ID")
 # write.csv(red_grid_3500_adjusted_ship_density, file="env_ship_covs_sighting_density_by_gridID_red_grid_05detect.csv")  
 
 #  Subset to only grid cells within 2500m of ship track line (detection probability under excellent, group size 1 = .15)
 red_grd_2500_tmp <- as.data.frame(shapefile("E:/AK_Shapefiles/trk_length_grid_join_2500.shp"))
 red_grd_2500 <- red_grd_2500_tmp %>%
-								  dplyr::select(Id) %>%
-								  rename(grid_ID = Id)
+                  dplyr::select(Id) %>%
+                  rename(grid_ID = Id)
 red_grid_2500_adjusted_ship_density <- semi_join(grid_env_ship_covs_sighting_density, red_grd_2500, by = "grid_ID")
 # write.csv(red_grid_2500_adjusted_ship_density, file="env_ship_covs_sighting_density_by_gridID_red_grid_15detect.csv")  
 ################################################################################
